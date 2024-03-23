@@ -9,7 +9,7 @@ SDL_Surface* gScreenSurface = NULL;
 SDL_Surface* g_background = NULL;
  
 
-bool loadMedia()
+bool LoadBackground()
 {
     bool success = true;
     g_background = IMG_Load("bkgn.png" );
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 {
     if(init() == true)
     {
-        if(loadMedia())
+        if(LoadBackground())
         {
             SDL_BlitSurface( g_background, NULL, gScreenSurface, NULL );
             SDL_UpdateWindowSurface(g_windows);
