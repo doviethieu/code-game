@@ -7,10 +7,8 @@
 
 int main(int argc, char* argv[])
 {
-
     bool bInit = GameMain::GetInstance()->Init();
     bool bInitData = GameMain::GetInstance()->InitData();
-
 
     if (bInit && bInitData)
     {

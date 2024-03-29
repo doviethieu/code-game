@@ -2,7 +2,7 @@
 #include "BaseObj.h"
 
 
-BaseObj::BaseObj(void)
+BaseObj::BaseObj(void) // khoi tao vi tri player ban dau
 {
     m_ObjectTexture = NULL;
     m_Rect.x = 0;
@@ -19,7 +19,7 @@ BaseObj::~BaseObj(void)
 }
 
 
-void BaseObj::Render(SDL_Renderer* des, const SDL_Rect* clip)
+void BaseObj::Render(SDL_Renderer* des, const SDL_Rect* clip) // ve lai texture, cho phep lat texture
 {
     if (m_ObjectTexture == NULL)
         return;
@@ -37,10 +37,10 @@ void BaseObj::Render(SDL_Renderer* des, const SDL_Rect* clip)
         iFlip = SDL_FLIP_HORIZONTAL;
     }
 
-    SDL_RenderCopyEx(des, m_ObjectTexture, &m_Rect, &rQuad, 0, NULL, (SDL_RendererFlip)iFlip);
+    SDL_RenderCopyEx(des, m_ObjectTexture, clip, &rQuad, 0, NULL, (SDL_RendererFlip)iFlip);
 }
 
-bool BaseObj::LoadImg(std::string path, SDL_Renderer* des)
+bool BaseObj::LoadImg(std::string path, SDL_Renderer* des)// nap anh tu file va su dung anh do de hien thi doi tuong
 {
     Free();
 

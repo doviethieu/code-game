@@ -2,6 +2,7 @@
 
 #include "DefineGame.h"
 #include "BaseObj.h"
+#include "PlayerObj.h"
 
 class GameMain
 {
@@ -31,6 +32,7 @@ private:
     SDL_Event m_event;
 
     BaseObj m_Bkgn;
+    PlayerObj m_Player;
 };
 
 

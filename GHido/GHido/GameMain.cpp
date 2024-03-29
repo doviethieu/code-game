@@ -26,6 +26,7 @@ bool GameMain::Init()
         return false;
     }
 
+    // Make windows for Game
     m_Window = SDL_CreateWindow("Hido Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN); 
     if (m_Window == NULL)
     {
@@ -49,15 +50,19 @@ bool GameMain::Init()
     return bRet;
 }
 
-bool GameMain::InitData()
+bool GameMain::InitData()// nap anh nen
 {
     std::string path = "image\\bkgn.png";
     bool ret = m_Bkgn.LoadImg(path, m_Screen);
 
+
+    bool ret2 = m_Player.LoadImg("image\\hido_move.png", m_Screen);
+    m_Player.Set_Pos(100, 200);
+
     return true;
 }
 
-void GameMain::LoopGame()
+void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau quit game
 {
     bool quit_game = false;
 
@@ -69,6 +74,8 @@ void GameMain::LoopGame()
             {
                 quit_game = true;
             }
+
+            m_Player.HandleInputAction(m_event,m_Screen);
         }
 
         SDL_Rect clip = SDL_Rect();
@@ -77,6 +84,9 @@ void GameMain::LoopGame()
         clip.w = SCREEN_WIDTH;
         clip.h = SCREEN_HEIGHT;
         m_Bkgn.Render(m_Screen, &clip);
+
+        m_Player.DoAction(m_Screen);
+        m_Player.Show(m_Screen);
 
         SDL_RenderPresent(m_Screen);
     }

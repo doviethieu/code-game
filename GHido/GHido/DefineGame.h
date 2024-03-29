@@ -19,4 +19,13 @@
 #define RENDER_DRAW_COLOR 0X00
 
 
+typedef struct Input
+{
+    int left_;
+    int right_;
+    int up_;
+    int down_;
+    int jump_;
+} Input;
+
 #endif
