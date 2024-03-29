@@ -3,6 +3,7 @@
 #include "DefineGame.h"
 #include "BaseObj.h"
 #include "PlayerObj.h"
+#include "MapData.h"
 
 class GameMain
 {

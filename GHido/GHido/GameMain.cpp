@@ -55,6 +55,10 @@ bool GameMain::InitData()// nap anh nen
     std::string path = "image\\bkgn.png";
     bool ret = m_Bkgn.LoadImg(path, m_Screen);
 
+    GameMap* game_map = GameMap::GetInstance();
+    game_map->SetPath("image\\map");
+    game_map->LoadMap();
+    game_map->LoadMapTiles(m_Screen);
 
     bool ret2 = m_Player.LoadImg("image\\hido_move.png", m_Screen);
     m_Player.Set_Pos(100, 200);
@@ -84,6 +88,8 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
         clip.w = SCREEN_WIDTH;
         clip.h = SCREEN_HEIGHT;
         m_Bkgn.Render(m_Screen, &clip);
+
+         GameMap::GetInstance()->DrawMap(m_Screen);
 
         m_Player.DoAction(m_Screen);
         m_Player.Show(m_Screen);
