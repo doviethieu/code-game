@@ -415,17 +415,17 @@ void GameMap::DrawMap(SDL_Renderer* des)
 bool GameMap::CheckSkipMap(const std::string& tile)
 {
     bool bRet = false;
-    //int nSize = sizeof(SkipMap) / sizeof(SkipMap[0]);
-    //for (int i = 0; i < nSize; ++i)
-    //{
-    //    std::string sType = SkipMap[i];
-    //    std::string sInput(tile);
-    //    if (sInput == sType)
-    //    {
-    //        bRet = true;
-    //        break;
-    //    }
-    //}
+    int nSize = sizeof(SkipMap) / sizeof(SkipMap[0]);
+    for (int i = 0; i < nSize; ++i)
+    {
+        std::string sType = SkipMap[i];
+        std::string sInput(tile);
+        if (sInput == sType)
+        {
+            bRet = true;
+            break;
+        }
+    }
 
     return bRet;
 }
@@ -438,5 +438,10 @@ int GameMap::GetValueProduct(const std::string& tile)
     {
         val = 1;
     }
+    else if (tile == "DIA1")
+    {
+        val = 3;
+    }
+
     return val;
 }

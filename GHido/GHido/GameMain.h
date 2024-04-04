@@ -4,6 +4,7 @@
 #include "BaseObj.h"
 #include "PlayerObj.h"
 #include "MapData.h"
+#include "ImpTimer.h"
 
 class GameMain
 {

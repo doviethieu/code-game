@@ -24,6 +24,8 @@
 
 #define VT(T) std::vector<T>
 
+#define EPXILON 2
+
 enum ColorBase
 {
     RED_COLOR = 0,
@@ -61,4 +63,10 @@ public:
     Uint8 blue_;
 
 };
+
+const int FRAMES_PER_SECOND = 35;
+
+#define GRAVITY_SPEED       1.0
+#define MAX_FALL_SPEED      15
+
 #endif

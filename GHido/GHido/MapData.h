@@ -5,6 +5,8 @@
 #include "DefineGame.h"
 #include "BaseObj.h"
 
+const std::string SkipMap[] = { "BR1", "BR2", "BR3", "HR1", "HR2", "0", "WTA2"};
+
 class BlockMap
 {
 public:

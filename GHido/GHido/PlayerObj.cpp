@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "PlayerObj.h"
-
+#include "TBase.h"
+#include "Music.h"
 
 PlayerObj::PlayerObj(void)
 {
@@ -15,6 +16,17 @@ PlayerObj::PlayerObj(void)
 
     x_val_ = 0;
     y_val_ = 0;
+
+    on_ground_ = false;
+
+    y_val_jump_ = 0;
+
+    m_bMinusBlood = false;
+
+    is_falling_ = false;
+    alive_time_ = 0;
+
+    m_CoinCount = 0;
 }
 
 
@@ -63,6 +75,11 @@ void PlayerObj::SetClip()
 
 void PlayerObj::HandleInputAction(SDL_Event events, SDL_Renderer* screen)
 {
+    if (is_falling_ == true)
+    {
+        return;
+    }
+
      if (events.type == SDL_KEYDOWN)
     {
         switch (events.key.keysym.sym)
@@ -107,28 +124,465 @@ void PlayerObj::HandleInputAction(SDL_Event events, SDL_Renderer* screen)
             break;
         }
     }
+      else if (events.type == SDL_MOUSEBUTTONDOWN)
+    {
+        // khi click chuột trái thì bắn đạn
+        if (events.button.button == SDL_BUTTON_LEFT)
+        {
+           ;//CreateBullet(screen);
+        }
+        else if (events.button.button == SDL_BUTTON_RIGHT)
+        {
+            // kích chuột phải thì nhảy lên
+            if (on_ground_ == true)
+            {
+                on_ground_ = false;
+                input_type_.jump_ = 1;
+                input_type_.down_ = 0;
+            }
+        }
+    }
+    else if (events.type == SDL_MOUSEBUTTONUP)
+    {
+        if (events.button.button == SDL_BUTTON_RIGHT)
+        {
+            input_type_.jump_ = 0;
+        }
+    }
 }
 
 void PlayerObj::DoAction(SDL_Renderer* des)
 {
-    if (input_type_.left_ == 1)
-    {
-            // giá trị x_val bị giảm 1 lương speed
-            x_val_ = -PLAYER_SPEED;
-    }
-    else if (input_type_.right_ == 1)
-    {
-            // với bên phải thì tăng 1 lượng speed
-            x_val_ = PLAYER_SPEED;
-    }
-   else if (input_type_.left_ == 0 && input_type_.right_ == 0)
-   {
-            // khi ko di chyển, thì giá trị tăng = 0
-            x_val_ = 0;
-   }
+    Map* data_map = GameMap::GetInstance()->GetMap();
 
+    if (is_falling_ == false)
+    {
+        if (input_type_.left_ == 1)
+        {
+                // giá trị x_val bị giảm 1 lương speed
+                x_val_ = -PLAYER_SPEED;
+        }
+        else if (input_type_.right_ == 1)
+        {
+                // với bên phải thì tăng 1 lượng speed
+                x_val_ = PLAYER_SPEED;
+        }
+       else if (input_type_.left_ == 0 && input_type_.right_ == 0)
+       {
+                // khi ko di chyển, thì giá trị tăng = 0
+                x_val_ = 0;
+       }
+
+        if (input_type_.jump_ == 1)
+        {
+            input_type_.jump_ = 0;
+            y_val_jump_ = -PLAYER_HIGHT_VAL;
+
+        }
+
+        if (y_val_jump_ < 0)
+        {
+            DoJump();
+        }
+        else
+        {
+            FreeFalling();
+        }
+
+        CheckToMap(des);
+
+        data_map->UpdateXMapInfo(x_pos_);
+        data_map->UpdateYMapInfo(y_pos_);
+    }
+    else
+    {
+         // nếu nhân vật bị chết, thì
+        // thời gian hồi sinh được thiết lập, ví dụ = 60
+        if (alive_time_ > 0)
+        {
+            // bắt đầu giảm thời gian hồi sinh
+            alive_time_ -= 1;
+            //FreeFalling();
+            //x_val_ = 0;
+            //CheckToMap(des);
+        }
+        else
+        {
+            // khi thời gian chời hồi sinh = 0
+            alive_time_ = 0;
+            x_val_ = 0;
+            y_val_ = 0;
+            // bắt đầu hồi sinh player
+            is_falling_ = false;
+            frame_ = 0;
+            ResetAlive();
+            //LoadImg(sPlayerMove, des);
+        }
+    }
+}
+
+
+void PlayerObj::ResetAlive()
+{
+    GameMap* pMap = GameMap::GetInstance();
+    if (pMap == NULL) return;
+
+    // xóa các hành vi trước đó
+    input_type_.left_ = 0;
+    input_type_.right_ = 0;
+    input_type_.jump_ = 0;
+    input_type_.down_ = 0;
+    input_type_.up_ = 0;
+
+    // tính toán lại vị trí hồi sinh
+    // lùi sau vị trí chết 4 tile
+    x_pos_ = x_pos_ - TILE_SIZE * 4;
+    if (x_pos_ < 0)
+    {
+        x_pos_ = 0;
+    }
+
+    y_pos_ = 200;
+
+    // tính toán lại vị trí vẽ player trên màn hình
+    Map* data_map = GameMap::GetInstance()->GetMap();
+
+    int mxStart = data_map->getStartX();
+    int myStart = data_map->getStartY();
+
+    m_Rect.x = x_pos_ - mxStart;
+    m_Rect.y = y_pos_ - myStart;
+}
+
+void PlayerObj::DoJump()
+{
+    GameMap* pMap = GameMap::GetInstance();
+    if (pMap == NULL || pMap->GetMap() == NULL)
+        return;
+
+    Map* data_map = pMap->GetMap();
+    VT(VT(BlockMap*)) tile_list = data_map->GetTile1();
+    if (tile_list.empty() == true)
+        return;
+
+
+    // Tại vị trí player đang thực hiện nhảy, x_pos, y_pos
+    int curTileX1 = (x_pos_) / TILE_SIZE;  // tìm ra chỉ số của ô tile map thứ nhất
+
+    // lấy giá trị x_pos + thêm chiều rộng đề tìm ra ô tile máp thứ 2
+    int xPosCur = (x_pos_ + width_frame_ - EPXILON);
+    int curTileX2 = xPosCur / TILE_SIZE;
+
+    // Nếu curTileX1, và curTileX2 bằng nhau, nghĩa là player đứng nguyên trong 1 ô tile map
+    // Nhưng nếu nó khác nhau, nghĩa là player đang đứng ở vị trí, 1 nửa ô tile này và 1 nửa ô tile kia.
+    // Do đó, phải check 2 ô tile với chiều X
+
+    // Khi nhảy lên, thì giá trị y_pos bị giảm đi 1 lượng (Phép công, nhưng chú ý :y_val_jum_ có giá trị âm)
+    // cần tìm ổ tile theo chiều y sau khi giảm.
+    // Mục đích là xem ô tile đó có phải tile va chạm hay ko, nếu có va chạm, thì player ko thể nhảy qua tile đó được.
+    int prevTileY = (y_pos_ + y_val_jump_) / TILE_SIZE;
+
+    std::vector<BlockMap*> bList;
+    // Lấy dữ liệu ô tile map tại vị trí 1
+    BlockMap* pBlock1 = GetBlockMap(prevTileY, curTileX1);
+    if (pBlock1 != NULL && pBlock1->GetTile() != NULL)
+    {
+        bList.push_back(pBlock1);
+    }
+
+    BlockMap* pBlock2 = GetBlockMap(prevTileY, curTileX2);
+    if (pBlock2 != NULL && pBlock2->GetTile() != NULL)
+    {
+        bList.push_back(pBlock2);
+    }
+
+    for (auto block : bList)
+    {
+        int ret = CheckBlock(block);
+        if (ret == 1)
+        {
+            y_pos_ = (prevTileY + 1)*TILE_SIZE;
+            y_val_jump_ = 0;
+            break;
+        }
+    }
+
+    // Nếu ko xảy ra bất cứ va chạm nào, thì 
+    // y_pos sẽ giảm 1 lượng giá trị y_val_jump
+    if (y_val_jump_ < 0)
+    {
+        y_pos_ += y_val_jump_;
+        y_val_jump_++;
+    }
+    else
+    {
+        y_val_jump_ = 0;
+    }
+}
+
+void PlayerObj::FreeFalling()
+{
+    GameMap* pMap = GameMap::GetInstance();
+    if (pMap == NULL || pMap->GetMap() == NULL)
+        return;
+
+    Map* data_map = pMap->GetMap();
+    VT(VT(BlockMap*)) tile_list = data_map->GetTile1();
+    if (tile_list.empty() == true)
+        return;
+
+    y_val_ += GRAVITY_SPEED;
+    if (y_val_ >= MAX_FALL_SPEED)
+    {
+        y_val_ = MAX_FALL_SPEED;
+    }
+
+    // Xác định 2 vị trí x1 và x2 để tìm 2 ô tile tương ứng với vị trí player đang rơi
+    int curTileX1 = x_pos_ / TILE_SIZE;
+    int curTileX2 = (x_pos_ + width_frame_) / TILE_SIZE;
+    int curTileMid = (x_pos_ + width_frame_*0.5) / TILE_SIZE;
+
+    // vì rơi nên sẽ tìm ô tile kế tiếp
+    int yPosNext = y_pos_ + height_frame_ + y_val_;
+    int nextTileY = yPosNext / TILE_SIZE;
+
+    std::vector<BlockMap*> bList;
+    BlockMap* pBlock1 = GetBlockMap(nextTileY, curTileX1);
+    if (pBlock1 != NULL && pBlock1->GetTile() != NULL)
+    {
+        bList.push_back(pBlock1);
+    }
+
+    BlockMap* pBlock2 = GetBlockMap(nextTileY, curTileX2);
+    if (pBlock2 != NULL && pBlock2->GetTile() != NULL)
+    {
+        bList.push_back(pBlock2);
+    }
+
+    BlockMap* pBlock3 = GetBlockMap(nextTileY, curTileMid);
+    if (pBlock3 != NULL && pBlock3->GetTile() != NULL)
+    {
+        bList.push_back(pBlock3);
+    }
+
+    for (auto block : bList)
+    {
+        int ret = CheckBlock(block);
+        if (ret == 1)
+        {
+            on_ground_ = true;
+            y_pos_ = nextTileY*TILE_SIZE - height_frame_;
+            y_val_ = 0;
+            break;
+        }
+    }
+}
+
+
+void PlayerObj::CheckToMap(SDL_Renderer* des)
+{
+    GameMap* pMap = GameMap::GetInstance();
+    if (pMap == NULL || pMap->GetMap() == NULL)
+        return;
+
+    Map* data_map = pMap->GetMap();
+
+    if (input_type_.right_ == 1) // MOVE RIGHT
+    {
+        DoRight();
+    }
+    else if (input_type_.left_ == 1) // MOVE LEFT
+    {
+        DoLeft();
+    }
+
+    // Nếu xử lý trải, phải không va chạm với tile
+    // giá trị x_val_ sẽ khác 0
+    // và x_pos, y_pos được thay đổi vị trí
+    // và như vậy player di chuyển tiếp
     x_pos_ += x_val_;
     y_pos_ += y_val_;
+
+    // nếu di chuyển trái, và khi di mãi về đầu bản đồ
+    if (x_pos_ < 0)
+    {
+        //thì sẽ chặn lại ko di chuyển được nữa
+        x_pos_ = 0;
+    }
+    else if (x_pos_ + width_frame_ >= data_map->getMaxX())
+    {
+        // Hoặc di chuyển tới cuối bản đồ
+        x_pos_ = data_map->getMaxX() - width_frame_ - EPXILON;
+    }
+
+    // giải sử khi bạn đứng ở tile rất cao, và nhảy cái vượt quá màn hình theo chiều y
+    // thì cũng chặn lại, ko cho vượt quá
+    if (y_pos_ < 0)
+    {
+        y_pos_ = 0;
+    }
+    else if (y_pos_ + height_frame_ >= data_map->getMaxY() + 2*TILE_SIZE)
+    {
+        // Khi y_pos vượt quá chiều cao của map theo phương y
+        // nghĩa là player bị rơi xuống vực
+        // coi như player chết, máu bị giảm đi 1 đơn vị
+        m_bMinusBlood = true;
+        is_falling_ = true; // thiết lập trạng thái rơi = true
+        alive_time_ = 100;  // thiết lập thời gian chờ hồi sinh là 100
+        //Music::GetInstance()->PlaySoundGame(Music::BLOOD_SOUND);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// xử lý va chạm với map khi di chuyển trái
+// Khác với nhảy và rơi, left right chỉ có 1 chiều.
+// và khi va chạm với ô tile a, thì player cũng phải đứng trọn vẹn trong  1 layer
+// (Trừ khi chúng ta cố tình vẽ tile a nằm 1 nửa tile x, 1 nửa tile y)
+//////////////////////////////////////////////////////////////////////////
+void PlayerObj::DoLeft()
+{
+    GameMap* pMap = GameMap::GetInstance();
+    if (pMap == NULL || pMap->GetMap() == NULL)
+        return;
+
+    Map* data_map = pMap->GetMap();
+    VT(VT(BlockMap*)) tile_list = data_map->GetTile1();
+    if (tile_list.empty() == true)
+        return;
+
+    int yPos = (y_pos_ + height_frame_ - 1);
+    int xPosPrev = (x_pos_ + x_val_);
+
+    // tìm ô tile sẽ di chuyển đến (bên trái) với curTileY và prevTileX
+    int curTileY = yPos / TILE_SIZE;
+    int prevTileX = xPosPrev / TILE_SIZE;
+
+    bool IsInside = TBase::CheckInsideMap(prevTileX, curTileY);
+    if (IsInside) 
+    {
+        // đảm bảo bên trong map
+        BlockMap* pBlock = GetBlockMap(curTileY, prevTileX);
+        if (pBlock != NULL)
+        {
+            if (pBlock->GetTile() != NULL)
+            {
+                int ret = CheckBlock(pBlock);
+                if (ret == 1)
+                {
+                    // player sẽ bị cản lại tại ô tile bên trái
+                    x_pos_ = prevTileX*TILE_SIZE + width_frame_;
+                    // ko cho di chuyển trái tiếp
+                    x_val_ = 0;
+                }
+            }
+        }
+    }
+    else
+    {
+        x_val_ = 0;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Hàm xử lý right cũng tương tự như hàm xử lý trái
+//////////////////////////////////////////////////////////////////////////
+void PlayerObj::DoRight()
+{
+    GameMap* pMap = GameMap::GetInstance();
+    if (pMap == NULL || pMap->GetMap() == NULL)
+        return;
+
+    Map* data_map = pMap->GetMap();
+    VT(VT(BlockMap*)) tile_list = data_map->GetTile1();
+    if (tile_list.empty() == true)
+        return;
+
+    int xPosNext = (x_pos_ + width_frame_ + x_val_);
+    int yPosEnd = (y_pos_ + height_frame_ - 1);
+
+    int nextTileX = xPosNext / TILE_SIZE;
+    int curTileY = yPosEnd / TILE_SIZE;
+
+    bool IsInside = TBase::CheckInsideMap(nextTileX, curTileY);
+    if (IsInside)
+    {
+        BlockMap* pBlock = GetBlockMap(curTileY, nextTileX);
+        if (pBlock != NULL)
+        {
+            if (pBlock->GetTile() != NULL)
+            {
+                int ret = CheckBlock(pBlock);
+                if (ret == 1)
+                {
+                    x_pos_ = nextTileX*TILE_SIZE - width_frame_;
+                    x_val_ = 0;
+                }
+            }
+        }
+    }
+    else
+    {
+        x_val_ = 0;
+    }
+}
+
+int PlayerObj::CheckBlock(BlockMap* block)
+{
+    GameMap* pMap = GameMap::GetInstance();
+
+    std::string sTile = block->getType();
+
+    if (sTile == "WB1")
+    {
+        int a = 5;
+    }
+    bool bSkip = pMap->CheckSkipMap(sTile);
+    int vProduct = pMap->GetValueProduct(sTile);
+
+    /*if (sTile == TILE_GUN)
+    {
+        m_Shot_Type = SHOT_LVL_1;
+        block->setTile(0);
+        return 0;
+    }*/
+    if (bSkip == false && vProduct == 0)
+    {
+        return 1;
+    }
+    else if (vProduct > 0)
+    {
+        Music::GetInstance()->PlaySoundGame(Music::COIN_INCREASING);
+        block->setTile(0);
+        m_CoinCount += vProduct;
+        return 2;
+    }
+
+    return -1;
+}
+
+BlockMap* PlayerObj::GetBlockMap(int y, int x)
+{
+    BlockMap* pBlock = NULL;
+    GameMap* pMap = GameMap::GetInstance();
+    if (pMap != NULL && pMap->GetMap())
+    {
+        Map* data_map = pMap->GetMap();
+        VT(VT(BlockMap*)) tile_list = data_map->GetTile1();
+        if (tile_list.empty() == false)
+        {
+            UINT yNum = tile_list.size();
+            if (y >= 0 && y < yNum)
+            {
+                UINT xNum = tile_list[y].size();
+                if (x >= 0 && x < xNum)
+                {
+                    pBlock = tile_list[y][x];
+                }
+            }
+        }
+    }
+
+    return pBlock;
 }
 
 void PlayerObj::UpdateImagePlayer()
@@ -145,23 +599,26 @@ void PlayerObj::UpdateImagePlayer()
 
 void PlayerObj::Show(SDL_Renderer* des)
 {
-    m_Rect.x = x_pos_;
-    m_Rect.y = y_pos_;
+     Map* data_map = GameMap::GetInstance()->GetMap();
+     m_Rect.x = x_pos_ - data_map->getStartX();
+     m_Rect.y = y_pos_ - data_map->getStartY();
 
-
-    if (input_type_.left_ == 0 && input_type_.right_ == 0 /*|| on_ground_ == false*/)
-    {
-         frame_ = 0;
-    }
-    else
-    {
-         ++frame_;
-         if (frame_ >= PLAYER_FRAMES)
-         {
+     if (is_falling_ == false)
+     {
+        if (input_type_.left_ == 0 && input_type_.right_ == 0 /*|| on_ground_ == false*/)
+        {
              frame_ = 0;
-         }
-    }
+        }
+        else
+        {
+             ++frame_;
+             if (frame_ >= PLAYER_FRAMES)
+             {
+                 frame_ = 0;
+             }
+        }
 
-    SDL_Rect* currentClip = &m_FrameClip[frame_];
-    BaseObj::Render(des, currentClip);
+        SDL_Rect* currentClip = &m_FrameClip[frame_];
+        BaseObj::Render(des, currentClip);
+     }
 }

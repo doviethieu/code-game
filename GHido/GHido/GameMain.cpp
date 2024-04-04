@@ -1,5 +1,6 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "GameMain.h"
+#include "Music.h"
 
 
 GameMain* GameMain::m_Instance = NULL;
@@ -47,6 +48,12 @@ bool GameMain::Init()
          return false;
      }
 
+        // Khởi tạo chế độ load âm thanh
+        if (Music::GetInstance()->Init() == false)
+        {
+            return false;
+        }
+
     return bRet;
 }
 
@@ -61,7 +68,7 @@ bool GameMain::InitData()// nap anh nen
     game_map->LoadMapTiles(m_Screen);
 
     bool ret2 = m_Player.LoadImg("image\\hido_move.png", m_Screen);
-    m_Player.Set_Pos(100, 200);
+    m_Player.Set_Pos(100, 50);
 
     return true;
 }
@@ -70,8 +77,11 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 {
     bool quit_game = false;
 
+    ImpTimer fps;
+
     while(quit_game == false)
     {
+        fps.start(); // bat dau chay, dong ho bat xac dinh thoi diem chay
         while (SDL_PollEvent(&m_event) != 0)
         {
             if (m_event.type == SDL_QUIT)
@@ -82,6 +92,9 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
             m_Player.HandleInputAction(m_event,m_Screen);
         }
 
+        // Chạy bản nhạc xuyên suốt quá trình chơi game
+        Music::GetInstance()->PlayMusic();
+
         SDL_Rect clip = SDL_Rect();
         clip.x = 0;
         clip.y = 0;
@@ -89,12 +102,17 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
         clip.h = SCREEN_HEIGHT;
         m_Bkgn.Render(m_Screen, &clip);
 
-         GameMap::GetInstance()->DrawMap(m_Screen);
+        GameMap::GetInstance()->DrawMap(m_Screen);
 
         m_Player.DoAction(m_Screen);
         m_Player.Show(m_Screen);
 
         SDL_RenderPresent(m_Screen);
+
+        if (fps.get_ticks() < 1000 / FRAMES_PER_SECOND)
+        {
+            SDL_Delay((1000 / FRAMES_PER_SECOND) - fps.get_ticks());
+        }
     }
 }
 
