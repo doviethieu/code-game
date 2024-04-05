@@ -55,7 +55,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)LibSdl2\SDL2_ttf-2.0.14\include;$(SolutionDir)LibSdl2\SDL2_mixer-2.0.2\include;$(SolutionDir)LibSdl2\SDL2_image-2.0.3\include;$(SolutionDir)LibSdl2\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)LibSdl2\SDL2_ttf-2.0.14\lib\x86;$(SolutionDir)LibSdl2\SDL2_mixer-2.0.2\lib\x86;$(SolutionDir)LibSdl2\SDL2_image-2.0.3\lib\x86;$(SolutionDir)LibSdl2\SDL2-2.0.8\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -85,27 +85,35 @@
     <ClInclude Include="BaseObj.h" />
     <ClInclude Include="DefineGame.h" />
     <ClInclude Include="GameMain.h" />
+    <ClInclude Include="Geometric.h" />
     <ClInclude Include="ImpTimer.h" />
     <ClInclude Include="MapData.h" />
+    <ClInclude Include="MenuGame.h" />
     <ClInclude Include="Music.h" />
+    <ClInclude Include="PlayerBlood.h" />
     <ClInclude Include="PlayerObj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TBase.h" />
+    <ClInclude Include="TextObj.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseObj.cpp" />
     <ClCompile Include="GameMain.cpp" />
+    <ClCompile Include="Geometric.cpp" />
     <ClCompile Include="ImpTimer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mapdata.cpp" />
+    <ClCompile Include="MenuGame.cpp" />
     <ClCompile Include="Music.cpp" />
+    <ClCompile Include="PlayerBlood.cpp" />
     <ClCompile Include="PlayerObj.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TBase.cpp" />
+    <ClCompile Include="TextObj.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

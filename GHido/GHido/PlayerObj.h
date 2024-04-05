@@ -45,6 +45,8 @@ public:
     void UpdateImagePlayer();
     void HandleInputAction(SDL_Event events, SDL_Renderer* screen);
     void ResetAlive();
+    bool CheckMinusBlood() {return m_bMinusBlood;};
+    void ResetFlagBlood() { m_bMinusBlood = false;}
 private:
     SDL_Rect m_FrameClip[PLAYER_FRAMES];
     int status_;

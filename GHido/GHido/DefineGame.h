@@ -18,6 +18,9 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 640
 
+#define H_WIDTH 640
+#define H_HEIGHT 320
+
 #define TILE_SIZE 64
 
 #define RENDER_DRAW_COLOR 0X00
@@ -25,6 +28,8 @@
 #define VT(T) std::vector<T>
 
 #define EPXILON 2
+
+#define TOP_FRAME_HEIGHT 45;
 
 enum ColorBase
 {
@@ -68,5 +73,8 @@ const int FRAMES_PER_SECOND = 35;
 
 #define GRAVITY_SPEED       1.0
 #define MAX_FALL_SPEED      15
+
+
+static char g_MenuFont[] = { "font\\g_font.ttf" };
 
 #endif
