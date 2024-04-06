@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "DefineGame.h"
 #include "BaseObj.h"
@@ -8,6 +8,7 @@
 #include "Geometric.h"
 #include "TextObj.h"
 #include "PlayerBlood.h"
+#include "MenuGame.h"
 
 class GameMain
 {
@@ -25,6 +26,14 @@ public:
     }
     static GameMain* m_Instance;
 
+    enum GameState
+    {
+        G_PLAYING = 300,
+        G_START,
+        G_PAUSE,
+        G_OVER,
+        G_END,
+    };
 
     bool Init();
     bool InitData();
@@ -39,6 +48,8 @@ private:
     SDL_Renderer* m_Screen;
     SDL_Event m_event;
 
+    int m_GameState;
+
     TTF_Font*   m_Font;
     TTF_Font*   m_FontTitle;
 
@@ -46,6 +57,11 @@ private:
     PlayerObj m_Player;
 
     PlayerBlood m_playerBlood;
+
+    MenuGameStart m_StartMenu; // thực hiện tạo màn hình start game
+    MenuGamePause m_PauseMenu; // thực hiện tạo màn hình pause game, dùng phím space
+    MenuGameEnd m_EndMenuOver; // màn hình endgame khi thua cuộc
+    MenuGameEnd m_EndMenuWin;  // màn hình endgame khi chiến thắng
 };
 
 

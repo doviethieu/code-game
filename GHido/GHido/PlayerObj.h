@@ -2,6 +2,8 @@
 #include "DefineGame.h"
 #include "BaseObj.h"
 #include "MapData.h"
+#include "BulletObj.h"
+#include "ExplosionObj.h"
 
 #define PLAYER_SPEED        8    // tốc độ di chuyển
 #define PLAYER_HIGHT_VAL    19   // tốc độ nhảy của player
@@ -47,6 +49,10 @@ public:
     void ResetAlive();
     bool CheckMinusBlood() {return m_bMinusBlood;};
     void ResetFlagBlood() { m_bMinusBlood = false;}
+    void CreateBullet(SDL_Renderer* screen);
+    void HandleBullet(SDL_Renderer* des, bool is_pause  = false);
+    void RemoveBullet(const int& idx);
+    void ReStart();
 private:
     SDL_Rect m_FrameClip[PLAYER_FRAMES];
     int status_;
@@ -71,4 +77,6 @@ private:
 
     bool is_falling_;
     int alive_time_;
+
+    VT(BulletObj*) m_BulList;
 };

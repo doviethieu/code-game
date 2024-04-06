@@ -61,7 +61,6 @@ bool Music::Init()
 // chạy âm thanh theo loại cần phát
 int Music::PlaySoundGame(int soundType)
 {
-    return 0;
     if (soundType == EXP_SOUND)
     {
         Mix_PlayChannel(-1, gChunkBoom, 0);

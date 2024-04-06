@@ -129,7 +129,7 @@ void PlayerObj::HandleInputAction(SDL_Event events, SDL_Renderer* screen)
         // khi click chuột trái thì bắn đạn
         if (events.button.button == SDL_BUTTON_LEFT)
         {
-           ;//CreateBullet(screen);
+           CreateBullet(screen);
         }
         else if (events.button.button == SDL_BUTTON_RIGHT)
         {
@@ -150,6 +150,103 @@ void PlayerObj::HandleInputAction(SDL_Event events, SDL_Renderer* screen)
         }
     }
 }
+
+void PlayerObj::CreateBullet(SDL_Renderer* screen)
+{
+        BulletObj* p_bullet = new BulletObj();
+        bool bRet = p_bullet->Init(kImgBullet, screen);
+        if (bRet == true)
+        {
+            Music::GetInstance()->PlaySoundGame(Music::BULLET_SOUND);
+            INT xBul = x_pos_;
+            if (status_ == WALK_LEFT)
+            {
+                // quay bên trái thì bắn sang bên trái
+                p_bullet->set_dir_bullet(BulletObj::BD_LEFT);
+                xBul -= p_bullet->GetRect().w;
+                xBul -= x_val_;
+            }
+            else
+            {
+                // quay bên phải bắn sang ben phải
+                p_bullet->set_dir_bullet(BulletObj::BD_RIGHT);
+                xBul += width_frame_;
+                xBul += x_val_;
+            }
+
+            INT yBul = y_pos_ + height_frame_*0.58;
+
+            p_bullet->set_xy_pos(xBul, yBul);
+            // tốc độ đạn
+            p_bullet->set_x_val(15);
+            m_BulList.push_back(p_bullet);
+        }
+}
+
+void PlayerObj::HandleBullet(SDL_Renderer* des, bool is_pause /* = false*/)
+{
+
+    int xBoder1 = 0;
+    int xBoder2 = 0;
+
+    xBoder1 = x_pos_ - 300;
+    xBoder2 = x_pos_ + width_frame_ + 300;
+
+    for (int i = 0; i < m_BulList.size(); i++)
+    {
+        BulletObj* bullet = m_BulList.at(i);
+        if (bullet != NULL)
+        {
+            if (bullet->get_is_move())
+            {
+                bullet->Show(des);
+                if (is_pause == false) // nếu dang pause thì ko di chuyển đạn
+                {
+                    bullet->HandleMove(xBoder1, xBoder2);
+
+                    // kiểm tra dạn va chạm với bản đồ
+                    bool ret = bullet->CheckToMap();
+                    if (ret == true)
+                    {
+                        bullet->set_is_move(false);
+
+                        ExplosionObj* pExp = new ExplosionObj(4);
+                        bool ret = pExp->LoadImg(sBoomName, des);
+                        if (ret)
+                        {
+                            SDL_Rect rc_pos = bullet->GetExpPos();
+                            pExp->SetXP(rc_pos);
+                            ExpList::GetInstance()->Add(pExp);
+                        }
+                        continue;
+                    }
+                }
+            }
+            else
+            {
+                // nếu đạn đi quá phạm vi thì sẽ xóa đạn
+                RemoveBullet(i);
+            }
+        }
+    }
+}
+
+
+void PlayerObj::RemoveBullet(const int& idx)
+{
+    if (m_BulList.size() > 0 && idx < m_BulList.size())
+    {
+        BulletObj* bullet = m_BulList.at(idx);
+        m_BulList.erase(m_BulList.begin() + idx);
+
+        if (bullet)
+        {
+            bullet->Free();
+            bullet = NULL;
+        }
+    }
+}
+
 
 void PlayerObj::DoAction(SDL_Renderer* des)
 {
@@ -621,4 +718,32 @@ void PlayerObj::Show(SDL_Renderer* des)
         SDL_Rect* currentClip = &m_FrameClip[frame_];
         BaseObj::Render(des, currentClip);
      }
+}
+
+void PlayerObj::ReStart()
+{
+    input_type_.left_ = 0;
+    input_type_.right_ = 0;
+    input_type_.jump_ = 0;
+    input_type_.down_ = 0;
+    input_type_.up_ = 0;
+    x_pos_ = 100;
+    y_pos_ = 100;
+    m_CoinCount = 0;
+
+
+    on_ground_ = false;
+    is_falling_ = false;
+
+    frame_ = 0;
+    x_pos_ = 0;
+    y_pos_ = 0;
+    x_val_ = 0;
+    y_val_ = 0;
+    width_frame_ = 0;
+    height_frame_ = 0;
+    status_ = WALK_NONE;
+    alive_time_ = 0;
+    m_bMinusBlood = false;
+    y_val_jump_ = 0;
 }

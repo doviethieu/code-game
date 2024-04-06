@@ -27,7 +27,13 @@ void MenuGame::Render(SDL_Renderer* screen)
 {
     if (m_isDrawBkgn == true)
     {
-        m_Background.Render(screen);
+        SDL_Rect clip = SDL_Rect();
+        clip.x = 0;
+        clip.y = 0;
+        clip.w = SCREEN_WIDTH;
+        clip.h = SCREEN_HEIGHT;
+
+        m_Background.Render(screen, &clip);
     }
 }
 
@@ -154,11 +160,11 @@ void MenuGameStart::MenuAction(SDL_Event events, SDL_Renderer* screen)
                 // thay đổi hình ảnh chữ trắng, sang chữ đổ tạo hiệu ứng trắng đỏ
                 if (i == 0)
                 {
-                    m_ImgOptionList[i]->LoadImg("image\\start_red.bmp", screen);
+                    m_ImgOptionList[i]->LoadImg("image\\start_red.png", screen);
                 }
                 else
                 {
-                    m_ImgOptionList[i]->LoadImg("image\\exit_red.bmp", screen);
+                    m_ImgOptionList[i]->LoadImg("image\\exit_red.png", screen);
                 }
             }
             else
@@ -166,11 +172,11 @@ void MenuGameStart::MenuAction(SDL_Event events, SDL_Renderer* screen)
                 // khi ra ngoài vùng button, thì lại load ảnh trắng
                 if (i == 0)
                 {
-                    m_ImgOptionList[i]->LoadImg("image\\start.bmp", screen);
+                    m_ImgOptionList[i]->LoadImg("image\\start.png", screen);
                 }
                 else
                 {
-                    m_ImgOptionList[i]->LoadImg("image\\exit.bmp", screen);
+                    m_ImgOptionList[i]->LoadImg("image\\exit.png", screen);
                 }
             }
         }
@@ -290,22 +296,22 @@ void MenuGamePause::MenuAction(SDL_Event events, SDL_Renderer* screen)
             {
                 if (i == 0)
                 {
-                     m_ImgOptionList[i]->LoadImg("image\\resume_red.bmp", screen);
+                     m_ImgOptionList[i]->LoadImg("image\\resume_red.png", screen);
                 }
                 else
                 {
-                    m_ImgOptionList[i]->LoadImg("image\\exit_red.bmp", screen);
+                    m_ImgOptionList[i]->LoadImg("image\\exit_red.png", screen);
                 }
             }
             else
             {
                 if (i == 0)
                 {
-                    m_ImgOptionList[i]->LoadImg("image\\resume.bmp", screen);
+                    m_ImgOptionList[i]->LoadImg("image\\resume.png", screen);
                 }
                 else
                 {
-                    m_ImgOptionList[i]->LoadImg("image\\exit.bmp", screen);
+                    m_ImgOptionList[i]->LoadImg("image\\exit.png", screen);
                 }
             }
         }

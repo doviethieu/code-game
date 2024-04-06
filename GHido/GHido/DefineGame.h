@@ -77,4 +77,8 @@ const int FRAMES_PER_SECOND = 35;
 
 static char g_MenuFont[] = { "font\\g_font.ttf" };
 
+static char kImgBullet[] = { "image//hido_bullet.png" };
+
+static char sBoomName[] = { "image//hido_ex.png" };
+
 #endif

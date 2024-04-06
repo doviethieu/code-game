@@ -83,7 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseObj.h" />
+    <ClInclude Include="BulletObj.h" />
     <ClInclude Include="DefineGame.h" />
+    <ClInclude Include="ExplosionObj.h" />
     <ClInclude Include="GameMain.h" />
     <ClInclude Include="Geometric.h" />
     <ClInclude Include="ImpTimer.h" />
@@ -99,6 +101,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseObj.cpp" />
+    <ClCompile Include="BulletObj.cpp" />
+    <ClCompile Include="ExplosionObj.cpp" />
     <ClCompile Include="GameMain.cpp" />
     <ClCompile Include="Geometric.cpp" />
     <ClCompile Include="ImpTimer.cpp" />
