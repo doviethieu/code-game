@@ -91,6 +91,7 @@
     <ClInclude Include="ImpTimer.h" />
     <ClInclude Include="MapData.h" />
     <ClInclude Include="MenuGame.h" />
+    <ClInclude Include="MonsterObj.h" />
     <ClInclude Include="Music.h" />
     <ClInclude Include="PlayerBlood.h" />
     <ClInclude Include="PlayerObj.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mapdata.cpp" />
     <ClCompile Include="MenuGame.cpp" />
+    <ClCompile Include="MonsterObj.cpp" />
     <ClCompile Include="Music.cpp" />
     <ClCompile Include="PlayerBlood.cpp" />
     <ClCompile Include="PlayerObj.cpp" />

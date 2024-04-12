@@ -3,6 +3,7 @@
 #include "Music.h"
 #include <Windows.h>
 #include "ExplosionObj.h"
+#include "MonsterObj.h"
 
 GameMain* GameMain::m_Instance = NULL;
 
@@ -171,6 +172,10 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
     ExpList* pExpList = ExpList::GetInstance();
 
+    MList* pMList = MList::GetInstance();
+    pMList->BuildMonster(m_Screen);
+
+
    unsigned int frame_count = 0; 
 
     while(quit_game == false)
@@ -256,6 +261,9 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
             m_Player.Show(m_Screen);
             m_Player.DoAction(m_Screen);
             m_Player.HandleBullet(m_Screen);
+
+            pMList->Render(m_Screen);
+
 
             if (m_Player.CheckMinusBlood() == true)
             {
@@ -381,6 +389,8 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 void GameMain::Close()
 {
     m_Bkgn.Free();
+
+    MList::GetInstance()->Free();
 
     SDL_DestroyRenderer(m_Screen);
     m_Screen = NULL;
