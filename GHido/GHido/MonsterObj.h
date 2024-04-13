@@ -18,7 +18,7 @@ public:
 
     enum MObjType
     {
-        M_NONE = 0,
+        M_NONE = 1000,
         M_MOVING_SHOT,
         M_STAND_ATTACK,
         M_BIRD,
@@ -40,7 +40,6 @@ public:
     void set_ypos(const int& yps) { y_pos_ = yps; }
     void set_clips();
     void set_is_alive(bool is_alive) { is_alive_ = is_alive; }
-    void set_is_clip(bool isclip) { is_clip_ = isclip; }
     void SetClipNum(int clip_num) { m_ClipNum = clip_num; }
 
     int get_x_pos() { return x_pos_; }
@@ -51,17 +50,16 @@ public:
     int GetType() const { return type_; }
     SDL_Rect GetRectFrame();
     void ResetBird();
+    VT(BulletObj*) GetBuls() {return m_BulletList;}
 
     void AddBullet(SDL_Renderer* screen);
     void DoBullet(SDL_Renderer* screen, bool is_pause = false);
     void InitStartPos(int& xBul, int& yBul);
 protected:
     Map* pMap_;
-    Input input_type_;
 
     VT(SDL_Rect) m_FrameClipList;
 
-    bool is_clip_;
     bool is_alive_;
 
     int on_ground_;
@@ -110,6 +108,9 @@ public:
     void MakeMShot(SDL_Renderer* screen);
     void MakeMStand(SDL_Renderer* screen);
     void MakeMBird(SDL_Renderer* screen);
+
+    bool CheckCol(const SDL_Rect& rect, SDL_Rect& exp_rect, bool bDel = true);
+    bool CheckColBul(const SDL_Rect& rect);
 private:
     static MList* instance_;
     std::vector <MonsterObj*> m_MonsterList;

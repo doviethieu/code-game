@@ -75,7 +75,7 @@ void PlayerObj::SetClip()
 
 void PlayerObj::HandleInputAction(SDL_Event events, SDL_Renderer* screen)
 {
-    if (is_falling_ == true)
+    if (is_falling_ == true || alive_time_ > 0)
     {
         return;
     }
@@ -252,7 +252,7 @@ void PlayerObj::DoAction(SDL_Renderer* des)
 {
     Map* data_map = GameMap::GetInstance()->GetMap();
 
-    if (is_falling_ == false)
+    if (is_falling_ == false && alive_time_ == 0)
     {
         if (input_type_.left_ == 1)
         {
@@ -299,21 +299,18 @@ void PlayerObj::DoAction(SDL_Renderer* des)
         {
             // bắt đầu giảm thời gian hồi sinh
             alive_time_ -= 1;
-            //FreeFalling();
-            //x_val_ = 0;
-            //CheckToMap(des);
-        }
-        else
-        {
-            // khi thời gian chời hồi sinh = 0
-            alive_time_ = 0;
-            x_val_ = 0;
-            y_val_ = 0;
-            // bắt đầu hồi sinh player
-            is_falling_ = false;
-            frame_ = 0;
-            ResetAlive();
-            //LoadImg(sPlayerMove, des);
+            if (alive_time_ <= 0)
+            {
+                // khi thời gian chời hồi sinh = 0
+                alive_time_ = 0;
+                x_val_ = 0;
+                y_val_ = 0;
+                // bắt đầu hồi sinh player
+                is_falling_ = false;
+                frame_ = 0;
+                ResetAlive();
+                //LoadImg(sPlayerMove, des);
+            }
         }
     }
 }
@@ -700,7 +697,7 @@ void PlayerObj::Show(SDL_Renderer* des)
      m_Rect.x = x_pos_ - data_map->getStartX();
      m_Rect.y = y_pos_ - data_map->getStartY();
 
-     if (is_falling_ == false)
+     if (is_falling_ == false && alive_time_ == 0)
      {
         if (input_type_.left_ == 0 && input_type_.right_ == 0 /*|| on_ground_ == false*/)
         {
@@ -746,4 +743,14 @@ void PlayerObj::ReStart()
     alive_time_ = 0;
     m_bMinusBlood = false;
     y_val_jump_ = 0;
+}
+
+bool PlayerObj::IsDeath()
+{
+    if (alive_time_ == 0)
+    {
+        return false;
+    }
+
+    return true;
 }

@@ -97,6 +97,9 @@ bool GameMain::InitData()// nap anh nen
 
     m_playerBlood.Init(m_Screen);
 
+    m_Coin.LoadImg("image\\coin_img.png", m_Screen);
+    m_Coin.SetRect(SCREEN_WIDTH*0.5-425, 10);
+
     //Init Start Game
     m_StartMenu.LoadBkgn("image\\menu_start.png", m_Screen);
      // Màn hình start game có 2 button player và exist
@@ -169,6 +172,10 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
     pTitleGame.SetColor(TextObj::ORANGE_TEXT);
     pTitleGame.LoadFromRenderedText(m_FontTitle, m_Screen);
     pTitleGame.SetPos(SCREEN_WIDTH*0.5-200, 10);
+
+    TextObj pCoinText;
+    pCoinText.SetColor(TextObj::WHITE_TEXT);
+    pCoinText.SetPos(SCREEN_WIDTH*0.5-400, 10);
 
     ExpList* pExpList = ExpList::GetInstance();
 
@@ -264,25 +271,93 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
             pMList->Render(m_Screen);
 
-
             if (m_Player.CheckMinusBlood() == true)
             {
                 m_playerBlood.MinusUpdate();
                 m_Player.ResetFlagBlood();
             }
 
-            // check player get coin 
-            // check ret coin > 100
-            // m_playerBlood.Plus...
+            int nCoin = m_Player.GetCoinCount();
+             std::string str_gold_val = std::to_string(nCoin);
+             std::string str_gold = "X" + str_gold_val;
+
+             pCoinText.SetText(str_gold);
+             pCoinText.LoadFromRenderedText(m_Font, m_Screen);
+             pCoinText.RenderText(m_Screen);
 
             // Blood/Alive Player
             m_playerBlood.Show(m_Screen);
+
+            m_Coin.Render(m_Screen);
+
+            if (m_Player.IsDeath() == false)
+            {
+                // check va cham giua dan cua player voi monster
+                VT(BulletObj*) player_buls = m_Player.GetBuls();
+                for (int iBul = 0; iBul < player_buls.size(); iBul++)
+                {
+                    BulletObj* p_bul = player_buls[iBul];
+                    if (p_bul->get_is_move() == true)
+                    {
+                        SDL_Rect bul_rect = p_bul->GetRect();
+
+                        SDL_Rect exp_rect;
+                        bool bCol = pMList->CheckCol(bul_rect, exp_rect);
+                        if (bCol)
+                        {
+                            ExplosionObj* pExp = new ExplosionObj(4);
+                            bool ret = pExp->LoadImg(sBoomName, m_Screen);
+                            if (ret)
+                            {
+                                // vị trí vụ nổ là vị trí của viên đạn khi xảy ra va chạm
+                                SDL_Rect rc_pos = exp_rect;
+                                rc_pos.x += exp_rect.w*0.5;
+                                rc_pos.y += exp_rect.h*0.5;
+
+                                pExp->SetXP(rc_pos);
+                                // lưu vụ nổ vào biến quản lý vụ ổ
+                                pExpList->Add(pExp);
+                            }
+                        }
+                    }
+                }
+
+                // Check va cham giua player va quai vat
+                SDL_Rect exp2_rect;
+                SDL_Rect player_rect = m_Player.GetRectFrame();
+                bool bCol2 = pMList->CheckCol(player_rect, exp2_rect, false);
+
+                // player vs đạn kẻ địch
+                bool bCol3 = pMList->CheckColBul(player_rect);
+
+                if (bCol2 || bCol3)
+                {
+                    ExplosionObj* pExp = new ExplosionObj(4);
+                    bool ret = pExp->LoadImg(sBoomName, m_Screen);
+                    if (ret)
+                    {
+                        // vị trí vụ nổ là vị trí của viên đạn khi xảy ra va chạm
+                        SDL_Rect rc_pos = player_rect;
+                        rc_pos.x += player_rect.w*0.5;
+                        rc_pos.y += player_rect.h*0.5;
+
+                        pExp->SetXP(rc_pos);
+                        // lưu vụ nổ vào biến quản lý vụ ổ
+                        pExpList->Add(pExp);
+                   }
+
+                    Music::GetInstance()->PlaySoundGame(Music::BLOOD_SOUND);
+                    m_Player.SetAliveTime(100);
+                    m_playerBlood.MinusUpdate();
+                }
+            }
 
             if (m_playerBlood.IsEmpty() == true)
             {
                 MessageBox(NULL, L"GAME OVER", L"Game Information", MB_ICONWARNING | MB_OK);
                 quit_game = true;
             }
+
 
              // Title
              pTitleGame.RenderText(m_Screen);
@@ -297,6 +372,7 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
             pExpList->Render(m_Screen);
   
+
             frame_count++;
             if (frame_count == FRAMES_PER_SECOND)
             {
@@ -328,8 +404,12 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
             m_playerBlood.Show(m_Screen);
 
+             m_Coin.Render(m_Screen);
+
             pTitleGame.RenderText(m_Screen);
 
+             m_Coin.Render(m_Screen);
+             pCoinText.RenderText(m_Screen);
             // Time
              std::string str_val = std::to_string(time_down);
              std::string str_time = "Time: " + str_val;
@@ -340,6 +420,8 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
               m_Player.Show(m_Screen);
               m_Player.HandleBullet(m_Screen, true);
+
+               pMList->Render(m_Screen, true);
 
                pExpList->Render(m_Screen, true);
 

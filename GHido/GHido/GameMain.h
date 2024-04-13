@@ -57,6 +57,7 @@ private:
     PlayerObj m_Player;
 
     PlayerBlood m_playerBlood;
+    BaseObj  m_Coin;
 
     MenuGameStart m_StartMenu; // thực hiện tạo màn hình start game
     MenuGamePause m_PauseMenu; // thực hiện tạo màn hình pause game, dùng phím space

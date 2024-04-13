@@ -53,6 +53,10 @@ public:
     void HandleBullet(SDL_Renderer* des, bool is_pause  = false);
     void RemoveBullet(const int& idx);
     void ReStart();
+    bool IsDeath();
+    void SetAliveTime(int time) {alive_time_ = time;}
+    VT(BulletObj*) GetBuls() {return m_BulList;}
+    int GetCoinCount() {return m_CoinCount;}
 private:
     SDL_Rect m_FrameClip[PLAYER_FRAMES];
     int status_;

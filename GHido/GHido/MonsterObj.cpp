@@ -4,7 +4,6 @@
 
 MonsterObj::MonsterObj(int clip_num)
 {
-    is_clip_ = true;
     is_alive_ = true;
 
     on_ground_ = 0;
@@ -19,10 +18,6 @@ MonsterObj::MonsterObj(int clip_num)
     y_pos_ = 0;
     m_ClipNum = clip_num;
     m_PassTime = 0;
-    input_type_.left_ = 0;
-    input_type_.right_ = 0;
-    input_type_.up_ = 0;
-    input_type_.down_ = 0;
     type_ = M_NONE;
     pMap_ = GameMap::GetInstance()->GetMap();
 
@@ -42,21 +37,13 @@ MonsterObj::~MonsterObj(void)
 bool MonsterObj::LoadImg(std::string path, SDL_Renderer* screen)
 {
      bool ret = BaseObj::LoadImg(path, screen);
-    if (is_clip_ == true)
-    {
-        if (ret == true)
-        {
+     if (ret == true)
+     {
             width_frame_ = m_Rect.w / m_ClipNum;
             height_frame_ = m_Rect.h;
-        }
+     }
 
-        set_clips();
-    }
-    else
-    {
-        width_frame_ = m_Rect.w;
-        height_frame_ = m_Rect.h;
-    }
+     set_clips();
 
     return ret;
 }
@@ -72,13 +59,21 @@ void MonsterObj::set_clips()
             rClip.y = 0;
             rClip.w = width_frame_;
             rClip.h = height_frame_;
-
             m_FrameClipList.push_back(rClip);
         }
     }
 }
 
+SDL_Rect MonsterObj::GetRectFrame()
+{
+    SDL_Rect rect;
+    rect.x = m_Rect.x;
+    rect.y = m_Rect.y;
+    rect.w = width_frame_;
+    rect.h = height_frame_;
 
+    return rect;
+}
 
 void MonsterObj::DoAction()
 {
@@ -109,6 +104,7 @@ void MonsterObj::CheckToMap()
             {
                 DoLeft();
             }
+
             x_pos_ += x_val_;
         }
     }
@@ -275,25 +271,21 @@ void MonsterObj::Show(SDL_Renderer* des, bool is_pause /*false*/)
         m_Rect.x = x_pos_ - pMap_->getStartX();
         m_Rect.y = y_pos_ - pMap_->getStartY();
 
-        if (is_clip_ == true)
+        if (is_pause == false)
         {
             if (SDL_GetTicks() - m_DelayTimeList[frame_] > m_PassTime)
             {
-                m_PassTime = SDL_GetTicks();
-                frame_++;
-                if (frame_ > m_ClipNum - 1)
-                {
-                    frame_ = 0;
-                }
+                    m_PassTime = SDL_GetTicks();
+                    frame_++;
+                    if (frame_ > m_ClipNum - 1)
+                    {
+                        frame_ = 0;
+                    }
             }
+        }
 
-            SDL_Rect* currentClip = &m_FrameClipList[frame_];
-            BaseObj::Render(des, currentClip);
-        }
-        else
-        {
-            BaseObj::Render(des);
-        }
+        SDL_Rect* currentClip = &m_FrameClipList[frame_];
+        BaseObj::Render(des, currentClip);
     }
 }
 
@@ -377,7 +369,7 @@ void MonsterObj::AddBullet(SDL_Renderer* screen)
     BulletObj* pBul = NULL;
     pBul = new BulletObj();
 
-    // hướng từ phải sang trái
+    // hướng từ trai ve phai
     if (v_dir_ == -1)
     {
         pBul->set_dir_bullet(BulletObj::BD_RIGHT);
@@ -392,7 +384,6 @@ void MonsterObj::AddBullet(SDL_Renderer* screen)
      InitStartPos(xBul, yBul);
      pBul->set_xy_pos(xBul, yBul);
      pBul->Init(kImgBulletCir, screen);
-
 
     // tốc độ 8
     pBul->set_x_val(8);
@@ -518,7 +509,6 @@ void MList::MakeMShot(SDL_Renderer* screen)
         for (int i = 0; i < gbNum; i++)
         {
             MonsterObj* pMonster = new MonsterObj(8);
-            pMonster->set_is_clip(true);
             pMonster->set_type(MonsterObj::M_MOVING_SHOT);
             int x_tile = gMonsterShot[i];
             int y_tile = 4;
@@ -542,7 +532,6 @@ void MList::MakeMStand(SDL_Renderer* screen)
         for (int i = 0; i < gbNum; i++)
         {
             MonsterObj* pMonster = new MonsterObj(4);
-            pMonster->set_is_clip(true);
             pMonster->set_type(MonsterObj::M_STAND_ATTACK);
             int x_tile = gMonsterStand[i];
             int y_tile = 2;
@@ -560,7 +549,6 @@ void MList::MakeMStand(SDL_Renderer* screen)
 void MList::MakeMBird(SDL_Renderer* screen)
 {
     MonsterObj* pMonster = new MonsterObj(4);
-    pMonster->set_is_clip(true);
     pMonster->set_type(MonsterObj::M_BIRD);
     int start_x = GameMap::GetInstance()->GetMap()->getStartX();
     int x_pos = start_x + 22*TILE_SIZE;
@@ -589,7 +577,7 @@ void MList::Render(SDL_Renderer* screen, bool is_pause /*false*/)
                     // di chuyển trên bản đồ cho monster
                     pMonster->DoAction();
                 }
-                pMonster->Show(screen);
+                pMonster->Show(screen, is_pause);
                 pMonster->DoBullet(screen, is_pause);
             }
             else if (pMonster->GetType() == MonsterObj::M_STAND_ATTACK)
@@ -620,4 +608,66 @@ void MList::Render(SDL_Renderer* screen, bool is_pause /*false*/)
             }
         }
     }
+}
+
+bool MList::CheckCol(const SDL_Rect& rect, SDL_Rect& exp_rect,  bool bDel /*= true*/)
+{
+    bool bRet = false;
+    for (int i = 0; i < m_MonsterList.size(); i++)
+    {
+        MonsterObj* pMonster = m_MonsterList.at(i);
+        if (pMonster != NULL)
+        {
+            SDL_Rect rect_monst = pMonster->GetRectFrame();
+            bool bColRect = TBase::CheckCollision(rect, rect_monst);
+            if (bColRect)
+            {
+                bRet = true;
+
+                if (bDel == true)
+                {
+                    pMonster->Free();
+                    m_MonsterList.erase(m_MonsterList.begin() + i);
+                }
+                exp_rect = rect_monst;
+                break;
+            }
+        }
+    }
+
+    return bRet;
+}
+
+bool MList::CheckColBul(const SDL_Rect& rect_object)
+{
+    bool bFindCol = false;
+    for (int i = 0; i < m_MonsterList.size(); i++)
+    {
+        MonsterObj* pMonster = m_MonsterList.at(i);
+        if (pMonster != NULL && pMonster->GetType() == MonsterObj::M_MOVING_SHOT)
+        {
+                std::vector<BulletObj*> bullet_list = pMonster->GetBuls();
+                for (int bul = 0; bul < bullet_list.size(); bul++)
+                {
+                    BulletObj* pBull = bullet_list[bul];
+                    if (pBull != NULL)
+                    {
+                        bool bCol = TBase::CheckCollision(rect_object, pBull->GetRect());
+                        if (bCol == true)
+                        {
+                            bFindCol = true;
+                            pBull->set_is_move(false);
+                            break;
+                        }
+                    }
+                }
+        }
+
+        if (bFindCol == true)
+        {
+            break;
+        }
+    }
+
+    return bFindCol;
 }
