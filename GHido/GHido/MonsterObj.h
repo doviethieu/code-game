@@ -7,7 +7,7 @@
 
 static char sMBird [] = {"image//m_bird.png"};
 static char sMShot [] = {"image//m_shot.png"};
-static char sMStand [] = {"image//m_stand.png"};
+static char sMStand [] = {"image//m_boom.png"};
 static char kImgBulletCir[] = { "image//bul_cir.png" };
 
 class MonsterObj : public BaseObj
@@ -111,6 +111,7 @@ public:
 
     bool CheckCol(const SDL_Rect& rect, SDL_Rect& exp_rect, bool bDel = true);
     bool CheckColBul(const SDL_Rect& rect);
+    void ReStart(SDL_Renderer* screen);
 private:
     static MList* instance_;
     std::vector <MonsterObj*> m_MonsterList;

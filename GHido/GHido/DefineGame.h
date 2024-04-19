@@ -81,4 +81,6 @@ static char kImgBullet[] = { "image//hido_bullet.png" };
 
 static char sBoomName[] = { "image//hido_ex.png" };
 
+static char sBoomNameBig[] = {"image//exp_big.png"};
+
 #endif

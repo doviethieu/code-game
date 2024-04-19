@@ -725,21 +725,16 @@ void PlayerObj::ReStart()
     input_type_.down_ = 0;
     input_type_.up_ = 0;
     x_pos_ = 100;
-    y_pos_ = 100;
+    y_pos_ = 50;
     m_CoinCount = 0;
-
 
     on_ground_ = false;
     is_falling_ = false;
 
     frame_ = 0;
-    x_pos_ = 0;
-    y_pos_ = 0;
     x_val_ = 0;
     y_val_ = 0;
-    width_frame_ = 0;
-    height_frame_ = 0;
-    status_ = WALK_NONE;
+    status_ = WALK_RIGHT;
     alive_time_ = 0;
     m_bMinusBlood = false;
     y_val_jump_ = 0;

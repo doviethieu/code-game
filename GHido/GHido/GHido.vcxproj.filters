@@ -69,6 +69,12 @@
     <ClInclude Include="MonsterObj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PrincessObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BossMonsterObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -117,6 +123,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MonsterObj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrincessObj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BossMonsterObj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

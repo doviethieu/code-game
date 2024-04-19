@@ -83,6 +83,13 @@ bool GameMain::InitData()// nap anh nen
     bool ret2 = m_Player.LoadImg("image\\hido_move.png", m_Screen);
     m_Player.Set_Pos(100, 50);
 
+    m_Princess.LoadImg("image\\princess.png", m_Screen);
+    m_Princess.Set_Pos(6272, 10); 
+
+    m_bossBlood.Init(m_Screen);
+    m_BossObj.LoadImg("image\\boss_img.png", m_Screen);
+    m_BossObj.Set_Pos(5632, 10); // BAN DO LA 100 O TILE, THI BOSS XUAT HIEN O CUOI BAN DO, CHON LA O THU 88-> 88*64
+
     m_TopFrame.m_rect.x = 0;
     m_TopFrame.m_rect.y = 0;
     m_TopFrame.m_rect.w = SCREEN_WIDTH;
@@ -152,6 +159,32 @@ bool GameMain::InitData()// nap anh nen
     m_PauseMenu.SetImgOptionList(pause_list);
     m_PauseMenu.InitFrameGeo();
 
+    // Init End Game
+    m_EndMenuWin.LoadBkgn("image\\end_game1.png", m_Screen);
+    m_EndMenuOver.LoadBkgn("image\\end_game2.png", m_Screen);
+
+    int x_pos_end = SCREEN_WIDTH*0.5 - 200;
+    int y_pos_end = SCREEN_HEIGHT - 300;
+
+    VT(BaseObj*) menu_end_list;
+    BaseObj* endObj = new BaseObj();
+    BaseObj* replay_obj = new BaseObj();
+
+    bool isReplay = endObj->LoadImg("image\\replay.png", m_Screen);
+    bool isExit = endObj->LoadImg("image\\exit.png", m_Screen);
+    if (isExit && isReplay)
+    {
+
+        replay_obj->SetRect(x_pos_end, y_pos_end);
+        endObj->SetRect(x_pos_end, y_pos_end + 50);
+
+        menu_end_list.push_back(replay_obj);
+        menu_end_list.push_back(endObj);
+
+        m_EndMenuOver.SetImgOptionList(menu_end_list);
+        m_EndMenuWin.SetImgOptionList(menu_end_list);
+    }
+
     return true;
 }
 
@@ -175,7 +208,7 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
     TextObj pCoinText;
     pCoinText.SetColor(TextObj::WHITE_TEXT);
-    pCoinText.SetPos(SCREEN_WIDTH*0.5-400, 10);
+    pCoinText.SetPos(SCREEN_WIDTH*0.5-390, 15);
 
     ExpList* pExpList = ExpList::GetInstance();
 
@@ -184,7 +217,7 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
 
    unsigned int frame_count = 0; 
-
+   bool is_win = false;
     while(quit_game == false)
     {
         fps.start(); // bat dau chay, dong ho bat xac dinh thoi diem chay
@@ -269,6 +302,13 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
             m_Player.DoAction(m_Screen);
             m_Player.HandleBullet(m_Screen);
 
+            m_Princess.Show(m_Screen);
+            m_Princess.DoAction(m_Screen);
+
+            m_BossObj.Show(m_Screen);
+            m_BossObj.DoAction(m_Screen);
+            m_BossObj.DoBullet(m_Screen);
+
             pMList->Render(m_Screen);
 
             if (m_Player.CheckMinusBlood() == true)
@@ -287,6 +327,14 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
             // Blood/Alive Player
             m_playerBlood.Show(m_Screen);
+
+            // KHI PLAYER DEN GAN BOSS, O TILE THU 80, THI BOSS CHUAN BI XUAT HIEN
+            // COT MAU LUC NAY MOI CHO PHEP XUAT HIEN
+            int xpos_player = m_Player.get_x_pos();
+            if (xpos_player >= 80*TILE_SIZE)
+            {
+                 m_bossBlood.Show(m_Screen);
+            }
 
             m_Coin.Render(m_Screen);
 
@@ -322,6 +370,82 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
                     }
                 }
 
+                // Check dan cua player voi Boss
+               for (int iBul = 0; iBul < player_buls.size(); iBul++)
+               {
+                    BulletObj* p_bul = player_buls[iBul];
+                    if (p_bul->get_is_move() == true)
+                    {
+                        SDL_Rect bul_rect = p_bul->GetRect();
+                        SDL_Rect exp_rect;
+                        bool is_col_boss = m_BossObj.CheckCol(bul_rect, exp_rect, true);
+                        if (is_col_boss)
+                        {
+                            p_bul->set_is_move(false);
+                            ExplosionObj* pExp = new ExplosionObj(4);
+                            bool ret = pExp->LoadImg(sBoomName, m_Screen);
+                            if (ret)
+                            {
+                                // vị trí vụ nổ là vị trí của viên đạn khi xảy ra va chạm
+                                SDL_Rect rc_pos = bul_rect;
+                                rc_pos.x += bul_rect.w*0.5;
+                                rc_pos.y += bul_rect.h*0.5;
+
+                                pExp->SetXP(rc_pos);
+                                // lưu vụ nổ vào biến quản lý vụ ổ
+                                pExpList->Add(pExp);
+                            }
+                        }
+                    }
+                }
+
+
+                int nHit = m_BossObj.GetHit();
+                if (nHit >= 4 )
+                {
+                      m_bossBlood.MinusUpdate();
+                      int tHit = nHit - 4;
+                      m_BossObj.SetHit(tHit);
+                }
+
+                if (m_bossBlood.GetCount() < 4)
+                {
+                    m_BossObj.UpdateImg("image\\boss_img2.png", m_Screen);
+                }
+
+                if (m_BossObj.isAlive() == true)
+                {
+                    if (m_bossBlood.IsEmpty() == true )
+                    {
+                        m_BossObj.SetDeath();
+                        SDL_Rect bos_rect = m_BossObj.GetRectFrame();
+
+                        ExplosionObj* pExp = new ExplosionObj(4);
+                        bool ret = pExp->LoadImg(sBoomNameBig, m_Screen);
+                        if (ret)
+                        {
+                            // vị trí vụ nổ là vị trí của viên đạn khi xảy ra va chạm
+                            SDL_Rect rc_pos = bos_rect;
+                            rc_pos.x += bos_rect.w*0.5;
+                            rc_pos.y += bos_rect.h*0.5;
+
+                            pExp->SetXP(rc_pos);
+                            // lưu vụ nổ vào biến quản lý vụ ổ
+                            pExpList->Add(pExp);
+                       }
+                    }
+                }
+
+                if (m_Player.get_x_pos() > 97*TILE_SIZE)
+                {
+                     is_win = true;
+                     m_GameState = GameState::G_END;
+                     Sleep(3000);
+                     continue;
+                }
+
+
+                // XU LY VA CHAM PLAYER VOI CAC DOI TUONG QUAI VAT-BOSS START
                 // Check va cham giua player va quai vat
                 SDL_Rect exp2_rect;
                 SDL_Rect player_rect = m_Player.GetRectFrame();
@@ -330,10 +454,18 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
                 // player vs đạn kẻ địch
                 bool bCol3 = pMList->CheckColBul(player_rect);
 
-                if (bCol2 || bCol3)
+                // player with boss
+                SDL_Rect exp_rect_boss;
+                bool bCold4 = m_BossObj.CheckCol(player_rect, exp_rect_boss);
+
+                // player with bulet boss
+                 bool bCol5 = m_BossObj.CheckColBul(player_rect);
+
+#if 1
+                if (bCol2 || bCol3 || bCold4 || bCol5)
                 {
                     ExplosionObj* pExp = new ExplosionObj(4);
-                    bool ret = pExp->LoadImg(sBoomName, m_Screen);
+                    bool ret = pExp->LoadImg(sBoomNameBig, m_Screen);
                     if (ret)
                     {
                         // vị trí vụ nổ là vị trí của viên đạn khi xảy ra va chạm
@@ -350,12 +482,15 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
                     m_Player.SetAliveTime(100);
                     m_playerBlood.MinusUpdate();
                 }
+#endif
+                 // XU LY VA CHAM PLAYER VOI CAC DOI TUONG QUAI VAT-BOSS END
             }
 
             if (m_playerBlood.IsEmpty() == true)
             {
-                MessageBox(NULL, L"GAME OVER", L"Game Information", MB_ICONWARNING | MB_OK);
-                quit_game = true;
+                 m_GameState = GameState::G_END;
+                 is_win = false;
+                 continue;
             }
 
 
@@ -382,8 +517,9 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
             if (time_down <= 0)
             {
-                 MessageBox(NULL, L"GAME OVER", L"Game Information", MB_ICONWARNING | MB_OK);
-                 quit_game = true;
+                 m_GameState = GameState::G_END;
+                 is_win = false;
+                 continue;
             }
         }
         else if (m_GameState == GameState::G_PAUSE)
@@ -404,7 +540,17 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
             m_playerBlood.Show(m_Screen);
 
-             m_Coin.Render(m_Screen);
+            int xpos_player = m_Player.get_x_pos();
+            if (xpos_player >= 80*TILE_SIZE)
+            {
+                m_bossBlood.Show(m_Screen);
+            }
+
+            m_BossObj.Show(m_Screen, true);
+            m_BossObj.DoAction(m_Screen, true);
+            m_BossObj.DoBullet(m_Screen, true);
+
+            m_Coin.Render(m_Screen);
 
             pTitleGame.RenderText(m_Screen);
 
@@ -420,6 +566,8 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
 
               m_Player.Show(m_Screen);
               m_Player.HandleBullet(m_Screen, true);
+
+              m_Princess.Show(m_Screen);
 
                pMList->Render(m_Screen, true);
 
@@ -457,7 +605,46 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
         }
         else if (m_GameState == GameState::G_END)
         {
+            int iCheck = -1;
+            if (is_win == true)
+            {
+                m_EndMenuWin.Render(m_Screen);
+                iCheck = m_EndMenuWin.GetSelect();
+                if (iCheck == 0)
+                {
+                    m_EndMenuWin.SetIsSelect(-1);
+                }
+            }
+            else
+            {
+                m_EndMenuOver.Render(m_Screen);
+                iCheck = m_EndMenuOver.GetSelect();
+                if (iCheck == 0)
+                {
+                     m_EndMenuOver.SetIsSelect(-1);
+                }
+            }
 
+            if (iCheck == 0)
+            {
+                    m_GameState = GameState::G_START;
+                    m_Player.ReStart();
+
+                    GameMap::GetInstance()->GetMap()->SetStartX(0);
+                    GameMap::GetInstance()->GetMap()->SetStartY(0);
+
+                    pMList->ReStart(m_Screen);
+                    time_down = 200;
+                    m_playerBlood.ReStart(m_Screen);
+                    pExpList->ResetExp();
+                    GameMap::GetInstance()->ResetMap(m_Screen);
+                    continue;
+            }
+            else if (iCheck == 1)
+            {
+                quit_game = true;
+                continue;
+            }
         }
 
         SDL_RenderPresent(m_Screen);
@@ -466,13 +653,34 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
             SDL_Delay((1000 / FRAMES_PER_SECOND) - fps.get_ticks());
         }
     }
+
+    pTime.Free();
+    pCoinText.Free();
+    pTitleGame.Free();
 }
 
 void GameMain::Close()
 {
     m_Bkgn.Free();
+    m_Player.Free();
+    m_Coin.Free();
+    m_playerBlood.FreeData();
+    GameMap::GetInstance()->GetMap()->RemoveList();
+    GameMap::GetInstance()->DestroyInst();
 
     MList::GetInstance()->Free();
+
+   // xoa du lieu backgroudn cua lop char
+    m_StartMenu.Free();
+    m_EndMenuWin.Free();
+    m_EndMenuOver.Free();
+
+    // xoa danh sach button
+    m_StartMenu.FreeData();
+    m_EndMenuWin.FreeData();
+    m_EndMenuOver.FreeData();
+
+    m_PauseMenu.FreeData();
 
     SDL_DestroyRenderer(m_Screen);
     m_Screen = NULL;

@@ -9,6 +9,8 @@
 #include "TextObj.h"
 #include "PlayerBlood.h"
 #include "MenuGame.h"
+#include "PrincessObj.h"
+#include "BossMonsterObj.h"
 
 class GameMain
 {
@@ -58,6 +60,9 @@ private:
 
     PlayerBlood m_playerBlood;
     BaseObj  m_Coin;
+    PrincessObj  m_Princess;
+    BossMonsterObj m_BossObj;
+    BossBlood m_bossBlood;
 
     MenuGameStart m_StartMenu; // thực hiện tạo màn hình start game
     MenuGamePause m_PauseMenu; // thực hiện tạo màn hình pause game, dùng phím space

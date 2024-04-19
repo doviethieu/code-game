@@ -671,3 +671,9 @@ bool MList::CheckColBul(const SDL_Rect& rect_object)
 
     return bFindCol;
 }
+
+void MList::ReStart(SDL_Renderer* screen)
+{
+    Free();
+    BuildMonster(screen);
+}

@@ -96,7 +96,6 @@ int Music::PlaySoundGame(int soundType)
 
 int Music::PlayMusic()
 {
-#if 0
     if (music_state_ == MS_STOP)
     {
         if (Mix_PlayMusic(g_music, -1) == -1)
@@ -105,7 +104,6 @@ int Music::PlayMusic()
         }
         music_state_ = MS_PLAY;
     }
-#endif
     return 0;
 }
 
