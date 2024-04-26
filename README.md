@@ -27,6 +27,7 @@ https://drive.google.com/file/d/10TeIVfx3R1635hsGdU7BjEZjWY6OhjrS/view?usp=shari
 b.Click vào link sau để tải source code game về chạy thử và nghiên cứu 
 https://github.com/doviethieu/code-game/tree/main
 
+![image](https://github.com/doviethieu/code-game/assets/160694745/0e143260-d789-4c5a-b47c-be3edc558499)
 
 + Sau khi tải về hãy giải nén 
 + Yêu cầu máy tính phải cài visual studio phiên bản 2012 trở lên
@@ -42,7 +43,8 @@ https://github.com/doviethieu/code-game/blob/main/GHido/img_readme/HiDo_Game_Git
 # 2.	Nội dung về game
 a.	Màn hình start game
 
-https://github.com/doviethieu/code-game/blob/main/GHido/img_readme/Startgame_Readme.jpg?raw=true
+![image](https://github.com/doviethieu/code-game/assets/160694745/1dc12329-1691-44dc-b0bd-e8a82d6f8d4b)
+
 
 Khi bắt đầu chơi game, màn hình start game được hiển thị, gồm background và 2 button. Play – Exit
 b.	Chương trình game
@@ -62,7 +64,8 @@ b.	Chương trình game
 
  
 
-+ Quái vật, Qụa vàng cản trở chiến binh Hido 
++ Quái vật, Qụa vàng cản trở chiến binh Hido
+  
   ![image](https://github.com/doviethieu/code-game/assets/160694745/39962e17-ac2a-4a1f-a567-86eefd48b3a9)
 
 
@@ -72,14 +75,17 @@ b.	Chương trình game
 
 
 + BOSS Game: Là 1 con Qủy Long, to lớn, màu xanh và có thể phun lửa.
+  
 ![image](https://github.com/doviethieu/code-game/assets/160694745/18bc659a-5f1e-45df-81dc-0e23454a567c)
 
  
 + Công chúa: Mục tiêu giải cứu của chiến binh Hido
+  
 ![image](https://github.com/doviethieu/code-game/assets/160694745/0c75f3af-b033-46f3-b343-e15d80c27569)
 
 c.	Màn hình Pause Game:
-Có 2 nut resume và exit
+Có 2 nút resume và exit
+
 ![image](https://github.com/doviethieu/code-game/assets/160694745/b70867ad-dc80-463f-8c31-d14200f01418)
 
 
@@ -111,7 +117,9 @@ Qủy Long rất mạnh, có thể phun lửa với tốc độ rất nhanh và 
 
 Phải bắn trúng quỷ long 4 viên đạn, thì mới làm cho quỷ Long mất đi 1 giọt máu.
 Khi nào Qủy Long gần chết, sẽ có dấu hiệu đó là, từ màu xanh, Qủy Long sẽ hóa dần sang màu đỏ cam.
+
 ![image](https://github.com/doviethieu/code-game/assets/160694745/8a61f64c-9f5f-47c8-a700-269b4e80a293)
+
 Hãy chú ý thời gian đang đếm ngược, hết thời gian mà HiDo chưa hạ được Qủy Long và đến gặp công chúa, Game sẽ coi là thua.
 
 # 4.	Game Win và Game Over
