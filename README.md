@@ -26,55 +26,69 @@ https://drive.google.com/file/d/10TeIVfx3R1635hsGdU7BjEZjWY6OhjrS/view?usp=shari
 
 b.Click vào link sau để tải source code game về chạy thử và nghiên cứu 
 https://github.com/doviethieu/code-game/tree/main
+
+
 + Sau khi tải về hãy giải nén 
 + Yêu cầu máy tính phải cài visual studio phiên bản 2012 trở lên
 + Build project ở cấu hình 32 bit, mode debug hoặc release
 + Sau khi build thành công thì hãy copy toàn bộ nội dung folder dưới đây  (res_game) vào thư mục debug hoặc release
-
-[Trong project, copy đống dll của thư viện sdl, copy folder image, sound, font ,  ra một folder bên ngoài ví dụ canh fodler lib_sdl, đặt tên là res_game,  sau đó add nó vào git và đây lên github, sau đó chụp ảnh project có folder res_game, và chỉ mũi tên vào đó]
 Ví dụ :
  
-
+https://github.com/doviethieu/code-game/blob/main/GHido/img_readme/HiDo_Game_Github.jpg?raw=true
 
 + F5 project trên visual để chạy, hoặc cũng có thể trực tiếp từ file exe được build ra.
  
 
 # 2.	Nội dung về game
 a.	Màn hình start game
-[em chạy game, chụp ảnh màn hình start game vào paste vào đây nhé]
+
+https://github.com/doviethieu/code-game/blob/main/GHido/img_readme/Startgame_Readme.jpg?raw=true
 
 Khi bắt đầu chơi game, màn hình start game được hiển thị, gồm background và 2 button. Play – Exit
 b.	Chương trình game
 + Nhân vật player có tên là chiến binh HiDo
   
+![image](https://github.com/doviethieu/code-game/assets/160694745/72aac878-a6d4-4f60-ae65-ac99c4830792)
+
+
 + Bối cảnh game: Bản đồ game thể loại tile map
- [chụp ảnh game đang chơi cho vào đây nhé]
+  
+![image](https://github.com/doviethieu/code-game/assets/160694745/98943869-6ee4-4d97-92da-b3fd368e81c1)
+
 
 + Hoạt cảnh game: Như đồng tiền (coin)
 
- 
+ ![image](https://github.com/doviethieu/code-game/assets/160694745/4e7829c0-1bee-4105-b440-cb337320b357)
+
  
 
 + Quái vật, Qụa vàng cản trở chiến binh Hido 
-     
+  ![image](https://github.com/doviethieu/code-game/assets/160694745/39962e17-ac2a-4a1f-a567-86eefd48b3a9)
+
 
 + Boom, cản trở gây sát thương chiến binh Hido
  
+![image](https://github.com/doviethieu/code-game/assets/160694745/ff414489-82f4-4b9c-a251-8a18ee980dec)
 
 
 + BOSS Game: Là 1 con Qủy Long, to lớn, màu xanh và có thể phun lửa.
+![image](https://github.com/doviethieu/code-game/assets/160694745/18bc659a-5f1e-45df-81dc-0e23454a567c)
 
  
 + Công chúa: Mục tiêu giải cứu của chiến binh Hido
- 
+![image](https://github.com/doviethieu/code-game/assets/160694745/0c75f3af-b033-46f3-b343-e15d80c27569)
 
 c.	Màn hình Pause Game:
 Có 2 nut resume và exit
-[em chụp màn hình pause game rồi cho vào đây nhé]
+![image](https://github.com/doviethieu/code-game/assets/160694745/b70867ad-dc80-463f-8c31-d14200f01418)
+
 
 d.	Màn hình EndGame
 Có 2 màn hình End Game là End Game Win và End Game Over
-[em chụp 2 màn hình End Game rồi cho vào đây nhé]
+![image](https://github.com/doviethieu/code-game/assets/160694745/fdfc7d45-061a-4cf4-a580-f5d6a9cb7344)
+
+![image](https://github.com/doviethieu/code-game/assets/160694745/e18014c8-b744-441a-9627-301e38d55ec0)
+
 
 # 3.	Cách chơi Game
 
@@ -92,9 +106,12 @@ Tránh dính phải đạn bắn của con quái vật.
 Hãy ăn các đồng tiền, để đạt được 100 đồng, thì sẽ được thêm 1 mạng
 Khi về đến gần cuối bài sẽ va chạm với con Qủy Long.
 Qủy Long rất mạnh, có thể phun lửa với tốc độ rất nhanh và có đến 10 cột máu
-[em thich bổ sung hình ảnh gì thì cho vào đây nhé]
+
+![image](https://github.com/doviethieu/code-game/assets/160694745/e9174090-6fc4-48e6-830d-34832e408875)
+
 Phải bắn trúng quỷ long 4 viên đạn, thì mới làm cho quỷ Long mất đi 1 giọt máu.
 Khi nào Qủy Long gần chết, sẽ có dấu hiệu đó là, từ màu xanh, Qủy Long sẽ hóa dần sang màu đỏ cam.
+![image](https://github.com/doviethieu/code-game/assets/160694745/8a61f64c-9f5f-47c8-a700-269b4e80a293)
 Hãy chú ý thời gian đang đếm ngược, hết thời gian mà HiDo chưa hạ được Qủy Long và đến gặp công chúa, Game sẽ coi là thua.
 
 # 4.	Game Win và Game Over
@@ -131,7 +148,8 @@ GameMain có 4 hoạt động chính.
 
 c.	Sơ đồ mô tả kiến trúc chương trình Game như sau
 
- 
+![image](https://github.com/doviethieu/code-game/assets/160694745/bc2875ee-b618-49e8-99b5-aa200af4db16)
+
 
 d.	Các đối tượng game
 Từ sơ đồ trên, cho thấy một chương trình game có rất nhiều đối tượng game.
