@@ -461,7 +461,6 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
                 // player with bulet boss
                  bool bCol5 = m_BossObj.CheckColBul(player_rect);
 
-#if 1
                 if (bCol2 || bCol3 || bCold4 || bCol5)
                 {
                     ExplosionObj* pExp = new ExplosionObj(4);
@@ -482,7 +481,6 @@ void GameMain::LoopGame() // ve nen va cap nhat hien thi cho den khi co yeu cau 
                     m_Player.SetAliveTime(100);
                     m_playerBlood.MinusUpdate();
                 }
-#endif
                  // XU LY VA CHAM PLAYER VOI CAC DOI TUONG QUAI VAT-BOSS END
             }
 
