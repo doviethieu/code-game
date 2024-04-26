@@ -32,11 +32,8 @@ https://github.com/doviethieu/code-game/tree/main
 + Sau khi tải về hãy giải nén 
 + Yêu cầu máy tính phải cài visual studio phiên bản 2012 trở lên
 + Build project ở cấu hình 32 bit, mode debug hoặc release
-+ Sau khi build thành công thì hãy copy toàn bộ nội dung folder dưới đây  (res_game) vào thư mục debug hoặc release
-Ví dụ :
- 
-https://github.com/doviethieu/code-game/blob/main/GHido/img_readme/HiDo_Game_Github.jpg?raw=true
-
++ Sau khi build thành công mở folder res_game. mở tiếp folder dll, copy toàn bộ dll vào thư mục debug.
+ Sau đó copy 3 thư mục: image, font, sound vào folder debug, và folder chứa source code.
 + F5 project trên visual để chạy, hoặc cũng có thể trực tiếp từ file exe được build ra.
  
 
